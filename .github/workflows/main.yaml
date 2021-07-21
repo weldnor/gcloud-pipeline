@@ -3,7 +3,7 @@ name: Java CI with Maven
 on: [ push, pull_request ]
 
 jobs:
-  push-to-gcloud:
+  push-image-to-gcloud:
     name: Push Docker image to Google container registry
     runs-on: ubuntu-latest
 
@@ -21,3 +21,17 @@ jobs:
           context: .
           push: true
           tags: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest
+
+  deploy-to-gcloud:
+    name: Deploy new image to gcloud run
+    runs-on: ubuntu-latest
+
+    needs: push-image-to-gcloud
+
+    steps:
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@main
+        with:
+          service: ${{ secrets.GCP_APP_NAME }}
+          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest
+          credentials: ${{ secrets.GCR_JSON_KEY }}
