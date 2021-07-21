@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-VERSION = '1.2'
+VERSION = '1.3'
 
 app = Flask(__name__)
 
